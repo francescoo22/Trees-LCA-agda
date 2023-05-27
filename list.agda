@@ -22,6 +22,6 @@ module list where
   [] ++ y = y
   (x ∷ xs) ++ y = x ∷ (xs ++ y)
 
-  lemma-++-size : {A : Set} → (xs : List A) → (ys : List A) → list-size (xs ++ ys) ≡ list-size xs + list-size ys
+  lemma-++-size : {A : Set} → (xs ys : List A) → list-size (xs ++ ys) ≡ list-size xs + list-size ys
   lemma-++-size [] ys = refl
   lemma-++-size (x ∷ xs) ys = cong succ (lemma-++-size xs ys)

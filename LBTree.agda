@@ -32,8 +32,21 @@ module LBTree where
   labels-list (l-leaf x) = x ∷ []
   labels-list (l-node x l r) = x ∷ (labels-list l ++ labels-list r)
 
-  TODO : {n : ℕ} → (t : BTree) → BTree-size t ≡ list-size (labels-list (label t n))
-  TODO t = {!   !}
+  lemma-BT-list-size : {n : ℕ} → (t : BTree) → BTree-size t ≡ list-size (labels-list (label t n))
+  lemma-BT-list-size leaf = refl
+  lemma-BT-list-size {n} (node l r) = begin
+    succ (BTree-size l + BTree-size r) 
+      ≡⟨ cong (λ x → succ (x + BTree-size r)) (lemma-BT-list-size l) ⟩
+    succ (list-size (labels-list (label l (succ n))) + BTree-size r) 
+      ≡⟨ cong (λ x → succ (list-size (labels-list (label l (succ n))) + x)) (lemma-BT-list-size r) ⟩
+    succ (list-size (labels-list (label l (succ n))) + list-size (labels-list (label r (succ (n + BTree-size l)))))
+      ≡⟨ cong succ (symm (lemma-++-size
+        (labels-list (label l (succ n)))
+        (labels-list (label r (succ (n + BTree-size l))))
+      )) ⟩
+    succ (list-size (labels-list (label l (succ n)) ++ labels-list (label r (succ (n + BTree-size l))))) ∎
+
+
 
   -- first naturals (0 ∷ 1 ∷ 2 ∷ []) 3
   prova : first-naturals (zero ∷ (succ zero ∷ (succ (succ zero) ∷ []))) (succ (succ (succ zero)))
