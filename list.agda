@@ -18,6 +18,9 @@ module list where
     base : first-naturals (zero ∷ []) (succ zero)
     step : {l : List ℕ} {n : ℕ} → first-naturals l n → first-naturals (append l n) (succ n)
 
+
+  infixr 5 _++_
+  
   _++_ : {A : Set} → List A → List A → List A
   [] ++ y = y
   (x ∷ xs) ++ y = x ∷ (xs ++ y)

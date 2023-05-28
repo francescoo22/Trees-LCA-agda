@@ -2,11 +2,16 @@ open import natural
 open import BTree
 open import list
 open import equality
+open import vector
 
 module LBTree where 
   data LBTree : Set where -- Labelled binary tree
     l-leaf : ℕ → LBTree
     l-node : ℕ → LBTree → LBTree → LBTree
+
+  data _∼_ : BTree → LBTree → Set where -- shape equivalence
+    ∼leaf : {n : ℕ} → leaf ∼ (l-leaf n)
+    ∼node : {n : ℕ} {l₁ r₁ : BTree} {l₂ r₂ : LBTree} → l₁ ∼ l₂ → r₁ ∼ r₂ → node l₁ r₁ ∼ l-node n l₂ r₂ 
 
   LBTree-size : LBTree → ℕ
   LBTree-size (l-leaf _) = succ zero
@@ -16,9 +21,21 @@ module LBTree where
   LBTree-height (l-leaf _) = succ zero
   LBTree-height (l-node _ l r) = succ (max (LBTree-height l) (LBTree-height r))
 
+  labels-list : LBTree → List ℕ
+  labels-list (l-leaf x) = x ∷ []
+  labels-list (l-node x l r) = x ∷ (labels-list l ++ labels-list r)
+
+  ---------------------------------
+  ----- unique tree labelling -----
+  ---------------------------------
+
   label : BTree → ℕ → LBTree -- label each node/leaf with a unique ℕ starting from the given one
   label leaf n = l-leaf n
   label (node l r) n = l-node n (label l (succ n)) (label r (succ (n + BTree-size l)))
+
+  lemma-BT-∼-label : {n : ℕ} → (t : BTree) → t ∼ label t n
+  lemma-BT-∼-label leaf = ∼leaf
+  lemma-BT-∼-label (node l r) = ∼node (lemma-BT-∼-label l) (lemma-BT-∼-label r)
 
   lemma-LBT-size : {x y : ℕ} → (t : BTree) → LBTree-size (label t x) ≡ LBTree-size (label t y)
   lemma-LBT-size leaf = refl
@@ -28,9 +45,6 @@ module LBTree where
   lemma-BT-LBT-size leaf = refl
   lemma-BT-LBT-size (node l r) = cong succ (add-aux₁ (lemma-BT-LBT-size l) (lemma-BT-LBT-size r))
 
-  labels-list : LBTree → List ℕ
-  labels-list (l-leaf x) = x ∷ []
-  labels-list (l-node x l r) = x ∷ (labels-list l ++ labels-list r)
 
   lemma-BT-list-size : {n : ℕ} → (t : BTree) → BTree-size t ≡ list-size (labels-list (label t n))
   lemma-BT-list-size leaf = refl
@@ -47,31 +61,36 @@ module LBTree where
     succ (list-size (labels-list (label l (succ n)) ++ labels-list (label r (succ (n + BTree-size l))))) ∎
 
 
+  --------------------------------
+  -------- label by depth --------
+  --------------------------------
 
-  -- first naturals (0 ∷ 1 ∷ 2 ∷ []) 3
-  prova : first-naturals (zero ∷ (succ zero ∷ (succ (succ zero) ∷ []))) (succ (succ (succ zero)))
-  prova = step (step base)
+  depth-label-aux : BTree → ℕ → LBTree 
+  depth-label-aux leaf n = l-leaf n
+  depth-label-aux (node l r) n = l-node n (depth-label-aux l (succ n)) (depth-label-aux r (succ n))
 
-  -- boh-lemma : (x y : ℕ) → (t : BTree) → list-size (labels-list (label t x)) ≡ list-size (labels-list (label t y))
-  -- boh-lemma x y leaf = refl
-  -- boh-lemma x y (node l r) with label l (succ x)
-  -- ... | p with label l (succ y)
-  -- ... | q = {!   !}
+  depth-label : BTree → LBTree -- label eache node/leaf with a value correspondign to his depth
+  depth-label t = depth-label-aux t zero
 
-  -- tree-size-≡-labels-size : {n : ℕ} → (t : BTree) → BTree-size t ≡ list-size (labels-list (label t n))
-  -- tree-size-≡-labels-size leaf = refl
-  -- tree-size-≡-labels-size (node l r) = {!   !}
+
+  -- -- first naturals (0 ∷ 1 ∷ 2 ∷ []) 3
+  -- prova : first-naturals (zero ∷ (succ zero ∷ (succ (succ zero) ∷ []))) (succ (succ (succ zero)))
+  -- prova = step (step base)
 
   -- -- the list obtained by calling "labels-list" on a tree t labelled using the function "label" is 
   -- -- 0 :: 1 :: 2 :: ... :: size(t) - 1
+  -- -- pre dimostrarlo l'idea dovrebbe essere: 
+  -- -- dichiaro il tipo "lista from x to y" e mostro che questo é lista from 0 to size(t) - 1
   -- lemma : (t : BTree) → first-naturals (labels-list (label t zero)) (BTree-size t)
   -- lemma leaf = base
-  -- lemma (node l r) with labels-list (label l (succ zero))
-  -- ... | l_list with (labels-list (label r (succ (BTree-size l))))
-  -- ... | r_list with BTree-size l
-  -- ... | sl with BTree-size r
-  -- lemma (node l r) | [] | [] | sl | sr = {!  base !}
-  -- lemma (node l r) | [] | y ∷ ys | sl | sr = {!   !}
-  -- lemma (node l r) | x ∷ xs | r_list | sl | sr = {!   !}
+  -- lemma (node l r) = {!   !}
 
+  -- parent-tree-list : (t : LBTree) → ℕ → List ℕ
+  -- parent-tree-list (l-leaf x) n = {!   !}
+  -- parent-tree-list (l-node x t t₁) n = {!   !}
 
+  -- vector in which at each position i, v[i] = label of the parent of the node labelled with import
+  -- except from the root which has parent equal to the value passed in input
+  parent-tree-vec : (t : LBTree) → ℕ → Vec ℕ (LBTree-size t)
+  parent-tree-vec (l-leaf x) n = n ∷ []
+  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x))
