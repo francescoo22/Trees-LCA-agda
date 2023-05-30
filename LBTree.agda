@@ -3,6 +3,7 @@ open import BTree
 open import list
 open import equality
 open import vector
+open import range
 
 module LBTree where 
   data LBTree : Set where -- Labelled binary tree
@@ -11,7 +12,16 @@ module LBTree where
 
   data _∼_ : BTree → LBTree → Set where -- shape equivalence
     ∼leaf : {n : ℕ} → leaf ∼ (l-leaf n)
-    ∼node : {n : ℕ} {l₁ r₁ : BTree} {l₂ r₂ : LBTree} → l₁ ∼ l₂ → r₁ ∼ r₂ → node l₁ r₁ ∼ l-node n l₂ r₂ 
+    ∼node : {n : ℕ} {l₁ r₁ : BTree} {l₂ r₂ : LBTree} → l₁ ∼ l₂ → r₁ ∼ r₂ → node l₁ r₁ ∼ l-node n l₂ r₂
+
+  data _∈_ : ℕ → LBTree → Set where
+    ∈-leaf  : {n : ℕ} → n ∈ l-leaf n
+    ∈-node  : {n : ℕ} {l r : LBTree} → n ∈ l-node n l r
+    ∈-left  : {n x : ℕ} {l r : LBTree} → n ∈ l → n ∈ l-node x l r
+    ∈-right : {n x : ℕ} {l r : LBTree} → n ∈ r → n ∈ l-node x l r
+
+  lemma-≡-∈ : {t : LBTree} {n m : ℕ} → n ≡ m → n ∈ t → m ∈ t
+  lemma-≡-∈ refl n∈t = n∈t
 
   LBTree-size : LBTree → ℕ
   LBTree-size (l-leaf _) = succ zero
@@ -60,6 +70,18 @@ module LBTree where
       )) ⟩
     succ (list-size (labels-list (label l (succ n)) ++ labels-list (label r (succ (n + BTree-size l))))) ∎
 
+  TODO : (t : BTree) → (n s : ℕ) → n ≥ s → n < (s + BTree-size t) → n ∈ label t s
+  TODO leaf n s p q = lemma-≡-∈ {!   !} ∈-leaf -- basta qualche proprietà sulle diseguaglianze
+  TODO (node l r) n .n base q = ∈-node
+  TODO (node l r) .(succ _) s (step p) q = {!   !} -- devo splittare la diseguaglianza nel caso in cui sono in l o r
+
+  boh : (t : BTree) → (n s : ℕ) → n ∈ s ⋯ (s + BTree-size t) → n ∈ label t s
+  boh leaf n s p = {!   !}
+  boh (node t t₁) n s p = {!   !}
+
+  lemma-unique-labelling : (t : BTree) → (n : ℕ) → n < BTree-size t → n ∈ label t zero
+  lemma-unique-labelling t n p =  TODO t n zero lemma-≥-zero p
+
 
   --------------------------------
   -------- label by depth --------
@@ -93,4 +115,4 @@ module LBTree where
   -- except from the root which has parent equal to the value passed in input
   parent-tree-vec : (t : LBTree) → ℕ → Vec ℕ (LBTree-size t)
   parent-tree-vec (l-leaf x) n = n ∷ []
-  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x))
+  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x)) 

@@ -7,6 +7,13 @@ module equality where
 
   data _≡_ {X : Set} : X → X → Set where
     refl : {a : X} → a ≡ a
+
+
+  infix 6 _⊎_
+  
+  data _⊎_ (A B : Set) : Set where
+    left  : A → A ⊎ B
+    right : B → A ⊎ B
     
 
   cong : {A B : Set} {x y : A} → (f : A → B) → x ≡ y → f x ≡ f y
@@ -42,3 +49,60 @@ module equality where
 
   add-aux₁ : {a b c d : ℕ} → a ≡ b → c ≡ d → a + c ≡ b + d
   add-aux₁ refl refl = refl
+
+  ------------------------
+  ----- inequalities -----
+  ------------------------
+
+  data _<_ : ℕ → ℕ → Set where
+    base : {n : ℕ} → n < succ n
+    step : {n m : ℕ} → n < m → n < succ m
+
+  data _≥_ : ℕ → ℕ → Set where
+    base : {n : ℕ} → n ≥ n
+    step : {n m : ℕ} → n ≥ m → succ n ≥ m
+
+  step₂-< : {n m : ℕ} → n < m → succ n < succ m
+  step₂-< base = base
+  step₂-< (step p) = step (step₂-< p)
+
+  step₂-≥ : {n m : ℕ} → n ≥ m → succ n ≥ succ m
+  step₂-≥ base = base
+  step₂-≥ (step x) = step (step₂-≥ x)
+
+  lemma-<-to-≥ : {n m : ℕ} → n < (succ m) → m ≥ n
+  lemma-<-to-≥ {n} {m} p = {!   !}
+  
+
+  lemma-≥-zero : {n : ℕ} → n ≥ zero
+  lemma-≥-zero {zero} = base
+  lemma-≥-zero {succ x} = step lemma-≥-zero
+
+  lemma-zero-<-succ : {n : ℕ} → zero < succ n
+  lemma-zero-<-succ {zero} = base
+  lemma-zero-<-succ {succ n} = step lemma-zero-<-succ
+
+  step₂-≥-rev : {n m : ℕ} → succ n ≥ succ m → n ≥ m
+  step₂-≥-rev base = base
+  step₂-≥-rev (step base) = step base
+  step₂-≥-rev (step (step x)) = step (step₂-≥-rev (step x))
+
+
+  lemma-≥-to-≡ : {n m : ℕ} → n ≥ m → m ≥ n → n ≡ m
+  lemma-≥-to-≡ {zero} {zero} p q = refl
+  lemma-≥-to-≡ {(succ n)} {(succ m)} p q = cong succ (lemma-≥-to-≡ {n} {m} (step₂-≥-rev p) (step₂-≥-rev q))
+
+
+  lemma-≥-<-to-≡ : {n m : ℕ} → n ≥ m → n < succ m → n ≡ m
+  lemma-≥-<-to-≡ p q = lemma-≥-to-≡ p (lemma-<-to-≥ q)
+  
+
+  lemma-split-aux : {n s : ℕ} → n < s ⊎ n ≥ s → (succ n) < (succ s) ⊎ (succ n) ≥ (succ s)
+  lemma-split-aux (left p) = left (step₂-< p)
+  lemma-split-aux (right p) = right (step₂-≥ p)
+
+  lemma-split-inequalities : (n s : ℕ) → n < s ⊎ n ≥ s
+  lemma-split-inequalities zero zero = right base
+  lemma-split-inequalities zero (succ s) = left lemma-zero-<-succ
+  lemma-split-inequalities (succ n) zero = right lemma-≥-zero
+  lemma-split-inequalities (succ n) (succ s) = lemma-split-aux (lemma-split-inequalities n s)
