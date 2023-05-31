@@ -14,10 +14,6 @@ module list where
   list-size [] = zero
   list-size (x ∷ xs) = succ (list-size xs)
 
-  data first-naturals : List ℕ → ℕ → Set where
-    base : first-naturals (zero ∷ []) (succ zero)
-    step : {l : List ℕ} {n : ℕ} → first-naturals l n → first-naturals (append l n) (succ n)
-
 
   infixr 5 _++_
   

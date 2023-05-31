@@ -47,8 +47,12 @@ module equality where
   --- additional lemmas ---
   -------------------------
 
-  add-aux₁ : {a b c d : ℕ} → a ≡ b → c ≡ d → a + c ≡ b + d
-  add-aux₁ refl refl = refl
+  add-eq₁ : {a b c d : ℕ} → a ≡ b → c ≡ d → a + c ≡ b + d
+  add-eq₁ refl refl = refl
+
+  add-eq₂ : {n : ℕ} → (n + succ zero) ≡ succ n
+  add-eq₂ {zero} = refl
+  add-eq₂ {succ n} = cong succ add-eq₂
 
   ------------------------
   ----- inequalities -----

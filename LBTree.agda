@@ -49,11 +49,11 @@ module LBTree where
 
   lemma-LBT-size : {x y : ℕ} → (t : BTree) → LBTree-size (label t x) ≡ LBTree-size (label t y)
   lemma-LBT-size leaf = refl
-  lemma-LBT-size (node l r) = cong succ (add-aux₁ (lemma-LBT-size l) (lemma-LBT-size r))
+  lemma-LBT-size (node l r) = cong succ (add-eq₁ (lemma-LBT-size l) (lemma-LBT-size r))
 
   lemma-BT-LBT-size : {n : ℕ} → (t : BTree) → BTree-size t ≡ LBTree-size (label t n)
   lemma-BT-LBT-size leaf = refl
-  lemma-BT-LBT-size (node l r) = cong succ (add-aux₁ (lemma-BT-LBT-size l) (lemma-BT-LBT-size r))
+  lemma-BT-LBT-size (node l r) = cong succ (add-eq₁ (lemma-BT-LBT-size l) (lemma-BT-LBT-size r))
 
 
   lemma-BT-list-size : {n : ℕ} → (t : BTree) → BTree-size t ≡ list-size (labels-list (label t n))
@@ -70,17 +70,18 @@ module LBTree where
       )) ⟩
     succ (list-size (labels-list (label l (succ n)) ++ labels-list (label r (succ (n + BTree-size l))))) ∎
 
-  TODO : (t : BTree) → (n s : ℕ) → n ≥ s → n < (s + BTree-size t) → n ∈ label t s
-  TODO leaf n s p q = lemma-≡-∈ {!   !} ∈-leaf -- basta qualche proprietà sulle diseguaglianze
-  TODO (node l r) n .n base q = ∈-node
-  TODO (node l r) .(succ _) s (step p) q = {!   !} -- devo splittare la diseguaglianza nel caso in cui sono in l o r
 
   boh : (t : BTree) → (n s : ℕ) → n ∈ s ⋯ (s + BTree-size t) → n ∈ label t s
-  boh leaf n s p = {!   !}
-  boh (node t t₁) n s p = {!   !}
+  boh leaf n s p = lemma-≡-∈ (symm (lemma-singleton-range (lemma-eq-range p add-eq₂))) ∈-leaf
+  boh (node l r) n s p with lemma-split-range (succ s) p
+  ... | left x = lemma-≡-∈ (symm (lemma-singleton-range x)) ∈-node
+  ... | right x = {!   !}
+    -- devo splittare in 3 range : 
+    -- s .. succ s | succ s .. succ s + size l |succ s + size l .. succ s + size l + size r 
+    
 
-  lemma-unique-labelling : (t : BTree) → (n : ℕ) → n < BTree-size t → n ∈ label t zero
-  lemma-unique-labelling t n p =  TODO t n zero lemma-≥-zero p
+  lemma-unique-labelling : (t : BTree) → (n : ℕ) → n ∈ zero ⋯ BTree-size t → n ∈ label t zero
+  lemma-unique-labelling t n p = boh t n zero p
 
 
   --------------------------------
@@ -94,25 +95,19 @@ module LBTree where
   depth-label : BTree → LBTree -- label eache node/leaf with a value correspondign to his depth
   depth-label t = depth-label-aux t zero
 
-
-  -- -- first naturals (0 ∷ 1 ∷ 2 ∷ []) 3
-  -- prova : first-naturals (zero ∷ (succ zero ∷ (succ (succ zero) ∷ []))) (succ (succ (succ zero)))
-  -- prova = step (step base)
-
-  -- -- the list obtained by calling "labels-list" on a tree t labelled using the function "label" is 
-  -- -- 0 :: 1 :: 2 :: ... :: size(t) - 1
-  -- -- pre dimostrarlo l'idea dovrebbe essere: 
-  -- -- dichiaro il tipo "lista from x to y" e mostro che questo é lista from 0 to size(t) - 1
-  -- lemma : (t : BTree) → first-naturals (labels-list (label t zero)) (BTree-size t)
-  -- lemma leaf = base
-  -- lemma (node l r) = {!   !}
+  depth : (t : LBTree) → (n : ℕ) → n ∈ t → ℕ -- va fatto passando un abitante di unique-labelled-tree (da implementare)
+  depth .(l-leaf n) n ∈-leaf = zero -- anche se tolgo il punto non cambia nulla
+  depth .(l-node n _ _) n ∈-node = zero
+  depth (l-node _ l _) n (∈-left p) = succ (depth l n p )
+  depth (l-node _ _ r) n (∈-right p) = succ (depth r n p)
 
   -- parent-tree-list : (t : LBTree) → ℕ → List ℕ
   -- parent-tree-list (l-leaf x) n = {!   !}
   -- parent-tree-list (l-node x t t₁) n = {!   !}
 
+
   -- vector in which at each position i, v[i] = label of the parent of the node labelled with import
   -- except from the root which has parent equal to the value passed in input
   parent-tree-vec : (t : LBTree) → ℕ → Vec ℕ (LBTree-size t)
   parent-tree-vec (l-leaf x) n = n ∷ []
-  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x)) 
+  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x))
