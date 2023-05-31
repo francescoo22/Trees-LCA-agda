@@ -54,6 +54,10 @@ module equality where
   add-eq₂ {zero} = refl
   add-eq₂ {succ n} = cong succ add-eq₂
 
+  -- (s + succ (BTree-size l + BTree-size r)) != (succ ((s + BTree-size l) + BTree-size r))
+  add-eq₃ : {a b c : ℕ} → (a + succ (b + c)) ≡ (succ ((a + b) + c))
+  add-eq₃ = {!   !}
+
   ------------------------
   ----- inequalities -----
   ------------------------
@@ -75,7 +79,9 @@ module equality where
   step₂-≥ (step x) = step (step₂-≥ x)
 
   lemma-<-to-≥ : {n m : ℕ} → n < (succ m) → m ≥ n
-  lemma-<-to-≥ {n} {m} p = {!   !}
+  lemma-<-to-≥ {n} {.n} base = base
+  lemma-<-to-≥ (step base) = step base
+  lemma-<-to-≥ (step (step x)) = step (lemma-<-to-≥ (step x))
   
 
   lemma-≥-zero : {n : ℕ} → n ≥ zero

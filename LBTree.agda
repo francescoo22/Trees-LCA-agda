@@ -20,6 +20,9 @@ module LBTree where
     ∈-left  : {n x : ℕ} {l r : LBTree} → n ∈ l → n ∈ l-node x l r
     ∈-right : {n x : ℕ} {l r : LBTree} → n ∈ r → n ∈ l-node x l r
 
+  -- idea definire anche il tipo ∉ ed un tipo "unique labelled tree" e poi mostrare proprietà con ∈ e ∉
+  -- o in alternativa uso ¬∈ 
+
   lemma-≡-∈ : {t : LBTree} {n m : ℕ} → n ≡ m → n ∈ t → m ∈ t
   lemma-≡-∈ refl n∈t = n∈t
 
@@ -71,17 +74,17 @@ module LBTree where
     succ (list-size (labels-list (label l (succ n)) ++ labels-list (label r (succ (n + BTree-size l))))) ∎
 
 
-  boh : (t : BTree) → (n s : ℕ) → n ∈ s ⋯ (s + BTree-size t) → n ∈ label t s
-  boh leaf n s p = lemma-≡-∈ (symm (lemma-singleton-range (lemma-eq-range p add-eq₂))) ∈-leaf
-  boh (node l r) n s p with lemma-split-range (succ s) p
+  lemma-unique-labelling : (t : BTree) → (n s : ℕ) → n ∈ s ⋯ (s + BTree-size t) → n ∈ label t s
+  lemma-unique-labelling leaf n s p = lemma-≡-∈ (symm (lemma-singleton-range (lemma-eq-range p add-eq₂))) ∈-leaf
+  lemma-unique-labelling (node l r) n s p with lemma-split-range (succ s) p
   ... | left x = lemma-≡-∈ (symm (lemma-singleton-range x)) ∈-node
-  ... | right x = {!   !}
-    -- devo splittare in 3 range : 
-    -- s .. succ s | succ s .. succ s + size l |succ s + size l .. succ s + size l + size r 
+  ... | right x with lemma-split-range (succ s + BTree-size l) x
+  ... | left x₁ = ∈-left (lemma-unique-labelling l n (succ s) x₁)
+  ... | right x₁ = ∈-right (lemma-unique-labelling r n (succ (s + BTree-size l)) (lemma-eq-range x₁ add-eq₃))
     
 
-  lemma-unique-labelling : (t : BTree) → (n : ℕ) → n ∈ zero ⋯ BTree-size t → n ∈ label t zero
-  lemma-unique-labelling t n p = boh t n zero p
+  lemma-unique-labelling₀ : (t : BTree) → (n : ℕ) → n ∈ zero ⋯ BTree-size t → n ∈ label t zero
+  lemma-unique-labelling₀ t n p = lemma-unique-labelling t n zero p
 
 
   --------------------------------
@@ -110,4 +113,4 @@ module LBTree where
   -- except from the root which has parent equal to the value passed in input
   parent-tree-vec : (t : LBTree) → ℕ → Vec ℕ (LBTree-size t)
   parent-tree-vec (l-leaf x) n = n ∷ []
-  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x))
+  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x)) 
