@@ -14,15 +14,17 @@ module equality where
   data _⊎_ (A B : Set) : Set where
     left  : A → A ⊎ B
     right : B → A ⊎ B
-    
+
+  data ⊥ : Set where
+
+  ¬ : Set → Set
+  ¬ X = X → ⊥
 
   cong : {A B : Set} {x y : A} → (f : A → B) → x ≡ y → f x ≡ f y
   cong f refl = refl
 
-
   symm : {A : Set} {x y : A} → x ≡ y → y ≡ x
   symm refl = refl
-
 
   trans : {A : Set} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
   trans refl refl = refl
@@ -42,6 +44,23 @@ module equality where
 
   begin_ : {A : Set} {x y : A} → x ≡ y → x ≡ y
   begin p = p
+
+  boooh : {a b : ℕ} → succ a ≡ succ b → a ≡ b
+  boooh refl = refl
+
+  boh-aux : {a b : ℕ} → ¬ (a ≡ b) → ¬ (succ a ≡ succ b)
+  boh-aux {zero} {zero} p = λ _ → p refl
+  boh-aux {zero} {succ x} p = λ ()
+  boh-aux {succ a} {zero} p = λ ()
+  boh-aux {succ a} {succ b} p q = p (boooh q)
+
+  split-equality : (a b : ℕ) → (a ≡ b) ⊎ (¬ (a ≡ b))
+  split-equality zero zero = left refl
+  split-equality zero (succ b) = right (λ ())
+  split-equality (succ a) zero = right (λ ())
+  split-equality (succ a) (succ b) with split-equality a b
+  ... | left x = left (cong succ x)
+  ... | right x = right (boh-aux x)
 
   -------------------------
   --- additional lemmas ---

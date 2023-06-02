@@ -11,3 +11,7 @@ module vector where
   _+++_ : {A : Set} {n m : ℕ} → Vec A m → Vec A n → Vec A (m + n)
   []       +++ ys = ys
   (x ∷ xs) +++ ys = x ∷ (xs +++ ys)
+
+  append : {A : Set} {n : ℕ} → Vec A n → A → Vec A (succ n)
+  append [] x = x ∷ []
+  append (y ∷ ys) x = y ∷ (append ys x)

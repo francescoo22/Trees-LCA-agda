@@ -1,9 +1,13 @@
+
+{-# OPTIONS --allow-unsolved-metas #-}
+
 open import natural
 open import BTree
 open import list
 open import equality
 open import vector
 open import range
+
 
 module LBTree where 
   data LBTree : Set where -- Labelled binary tree
@@ -19,6 +23,18 @@ module LBTree where
     ∈-node  : {n : ℕ} {l r : LBTree} → n ∈ l-node n l r
     ∈-left  : {n x : ℕ} {l r : LBTree} → n ∈ l → n ∈ l-node x l r
     ∈-right : {n x : ℕ} {l r : LBTree} → n ∈ r → n ∈ l-node x l r
+
+  -- QUESTA DEFINIZIONE È SBAGLIATA
+  data distinct-tree : LBTree → Set where
+    base : {x : ℕ} → distinct-tree (l-leaf x)
+    step : {x : ℕ} {l r : LBTree} → 
+                    ¬ (x ∈ l) → ¬ (x ∈ r) →
+                    distinct-tree l →
+                    distinct-tree r →
+                    ({y : ℕ} → (y ∈ l) → (y ∈ r) → ⊥) →
+                    distinct-tree (l-node x l r)
+
+  -- distinct-split : {t : LBTree} → distinct-tree t → (x : ℕ) →                     
 
   -- idea definire anche il tipo ∉ ed un tipo "unique labelled tree" e poi mostrare proprietà con ∈ e ∉
   -- o in alternativa uso ¬∈ 
@@ -98,19 +114,28 @@ module LBTree where
   depth-label : BTree → LBTree -- label eache node/leaf with a value correspondign to his depth
   depth-label t = depth-label-aux t zero
 
-  depth : (t : LBTree) → (n : ℕ) → n ∈ t → ℕ -- va fatto passando un abitante di unique-labelled-tree (da implementare)
-  depth .(l-leaf n) n ∈-leaf = zero -- anche se tolgo il punto non cambia nulla
-  depth .(l-node n _ _) n ∈-node = zero
-  depth (l-node _ l _) n (∈-left p) = succ (depth l n p )
-  depth (l-node _ _ r) n (∈-right p) = succ (depth r n p)
+  -- depth : (t : LBTree) → (n : ℕ) → n ∈ t → ℕ -- va fatto passando un abitante di unique-labelled-tree (da implementare)
+  -- depth .(l-leaf n) n ∈-leaf = zero -- anche se tolgo il punto non cambia nulla
+  -- depth .(l-node n _ _) n ∈-node = zero
+  -- depth (l-node _ l _) n (∈-left p) = succ (depth l n p )
+  -- depth (l-node _ _ r) n (∈-right p) = succ (depth r n p)
+
+  depth : {t : LBTree} → distinct-tree t → (n : ℕ) → n ∈ t → ℕ
+  depth {l-leaf x} dist n p = zero
+  depth {l-node x l r} dist .x ∈-node = zero
+  depth {l-node x l r} (step x₁ x₂ dist dist₁ x₃) n (∈-left p) = succ (depth dist n p)
+  depth {l-node x l r} (step x₁ x₂ dist dist₁ x₃) n (∈-right p) = succ (depth dist₁ n p)
+
+  -- forse conviene definire la root del tree in qualche modo
+  parent : {t : LBTree} → distinct-tree t → (n : ℕ) → n ∈ t → ℕ
+  parent {l-leaf x} dist n p = zero
+  parent {l-node x l r} dist .x ∈-node = zero
+  parent {l-node x l r} dist n (∈-left p) = {!   !}
+  parent {l-node x l r} dist n (∈-right p) = {!   !}
+
 
   -- parent-tree-list : (t : LBTree) → ℕ → List ℕ
   -- parent-tree-list (l-leaf x) n = {!   !}
   -- parent-tree-list (l-node x t t₁) n = {!   !}
 
 
-  -- vector in which at each position i, v[i] = label of the parent of the node labelled with import
-  -- except from the root which has parent equal to the value passed in input
-  parent-tree-vec : (t : LBTree) → ℕ → Vec ℕ (LBTree-size t)
-  parent-tree-vec (l-leaf x) n = n ∷ []
-  parent-tree-vec (l-node x l r) n = n ∷ ((parent-tree-vec l x) +++ (parent-tree-vec r x)) 
