@@ -7,6 +7,7 @@ open import list
 open import equality
 open import vector
 open import range
+open import optional
 
 
 module LBTree where 
@@ -24,20 +25,10 @@ module LBTree where
     ∈-left  : {n x : ℕ} {l r : LBTree} → n ∈ l → n ∈ l-node x l r
     ∈-right : {n x : ℕ} {l r : LBTree} → n ∈ r → n ∈ l-node x l r
 
-  -- QUESTA DEFINIZIONE È SBAGLIATA
-  data distinct-tree : LBTree → Set where
-    base : {x : ℕ} → distinct-tree (l-leaf x)
-    step : {x : ℕ} {l r : LBTree} → 
-                    ¬ (x ∈ l) → ¬ (x ∈ r) →
-                    distinct-tree l →
-                    distinct-tree r →
-                    ({y : ℕ} → (y ∈ l) → (y ∈ r) → ⊥) →
-                    distinct-tree (l-node x l r)
 
-  -- distinct-split : {t : LBTree} → distinct-tree t → (x : ℕ) →                     
 
-  -- idea definire anche il tipo ∉ ed un tipo "unique labelled tree" e poi mostrare proprietà con ∈ e ∉
-  -- o in alternativa uso ¬∈ 
+
+
 
   lemma-≡-∈ : {t : LBTree} {n m : ℕ} → n ≡ m → n ∈ t → m ∈ t
   lemma-≡-∈ refl n∈t = n∈t
@@ -120,18 +111,7 @@ module LBTree where
   -- depth (l-node _ l _) n (∈-left p) = succ (depth l n p )
   -- depth (l-node _ _ r) n (∈-right p) = succ (depth r n p)
 
-  depth : {t : LBTree} → distinct-tree t → (n : ℕ) → n ∈ t → ℕ
-  depth {l-leaf x} dist n p = zero
-  depth {l-node x l r} dist .x ∈-node = zero
-  depth {l-node x l r} (step x₁ x₂ dist dist₁ x₃) n (∈-left p) = succ (depth dist n p)
-  depth {l-node x l r} (step x₁ x₂ dist dist₁ x₃) n (∈-right p) = succ (depth dist₁ n p)
-
-  -- forse conviene definire la root del tree in qualche modo
-  parent : {t : LBTree} → distinct-tree t → (n : ℕ) → n ∈ t → ℕ
-  parent {l-leaf x} dist n p = zero
-  parent {l-node x l r} dist .x ∈-node = zero
-  parent {l-node x l r} dist n (∈-left p) = {!   !}
-  parent {l-node x l r} dist n (∈-right p) = {!   !}
+  
 
 
   -- parent-tree-list : (t : LBTree) → ℕ → List ℕ
