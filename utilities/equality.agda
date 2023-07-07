@@ -1,8 +1,8 @@
 {-# OPTIONS --allow-unsolved-metas #-}
-open import natural
+open import utilities.natural
 
 
-module equality where
+module utilities.equality where
   infix 5 _≡_
 
   data _≡_ {X : Set} : X → X → Set where

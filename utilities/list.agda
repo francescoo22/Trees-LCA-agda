@@ -1,7 +1,7 @@
-open import natural
-open import equality
+open import utilities.natural
+open import utilities.equality
 
-module list where
+module utilities.list where
   data List (A : Set) : Set where
     []  : List A
     _∷_ : A → List A → List A

@@ -1,8 +1,9 @@
-open import LBTree
-open import natural
-open import equality
+open import trees.LBTree
+open import trees.distinct-tree
+open import utilities.natural
+open import utilities.equality
 
-module LCA where
+module trees.LCA where
   -- data LCA : {t : LBTree} → distinct-tree t → (x y : ℕ) → x ∈ t → y ∈ t → Set where
 
   LCA-alg : {t : LBTree} → distinct-tree t → (x y : ℕ) → x ∈ t → y ∈ t → ℕ

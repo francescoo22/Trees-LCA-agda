@@ -1,8 +1,8 @@
-open import equality
-open import natural
-open import list
+open import utilities.equality
+open import utilities.natural
+open import utilities.list
 
-module BTree where
+module trees.BTree where
 
   data BTree : Set where
     leaf : BTree

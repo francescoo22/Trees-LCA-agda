@@ -1,16 +1,16 @@
 
 {-# OPTIONS --allow-unsolved-metas #-}
 
-open import natural
-open import BTree
-open import list
-open import equality
-open import vector
-open import range
-open import optional
+open import utilities.natural
+open import trees.BTree
+open import utilities.list
+open import utilities.equality
+open import utilities.vector
+open import utilities.range
+open import utilities.optional
 
 
-module LBTree where 
+module trees.LBTree where 
   data LBTree : Set where -- Labelled binary tree
     l-leaf : ℕ → LBTree
     l-node : ℕ → LBTree → LBTree → LBTree

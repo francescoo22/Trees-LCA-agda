@@ -1,4 +1,4 @@
-module natural where
+module utilities.natural where
   data ℕ : Set where
     zero : ℕ
     succ : ℕ → ℕ

@@ -1,9 +1,9 @@
-open import natural
--- open import vector
-open import equality
-open import range
+open import utilities.natural
+-- open import utilities.vector
+open import utilities.equality
+open import utilities.range
 
-module PTree where
+module trees.PTree where
 
   data Vecᵣ (A : Set) : ℕ → Set where
     []  : Vecᵣ A zero

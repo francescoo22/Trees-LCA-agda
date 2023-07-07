@@ -1,9 +1,11 @@
-open import LBTree
-open import optional
-open import equality
-open import natural
+{-# OPTIONS --allow-unsolved-metas #-}
 
-module distinct-tree where
+open import trees.LBTree
+open import utilities.optional
+open import utilities.equality
+open import utilities.natural
+
+module trees.distinct-tree where
   data distinct-tree : LBTree → Set where
     base : {x : ℕ} → distinct-tree (l-leaf x)
     step : {x : ℕ} {l r : LBTree} → 

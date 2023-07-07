@@ -1,6 +1,6 @@
-open import natural
+open import utilities.natural
 
-module vector where
+module utilities.vector where
   infixr 5 _∷_
   data Vec (A : Set) : ℕ → Set where
     []  : Vec A zero

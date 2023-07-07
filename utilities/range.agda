@@ -1,7 +1,7 @@
-open import equality
-open import natural
+open import utilities.equality
+open import utilities.natural
 
-module range where
+module utilities.range where
 
   --- x ∈ a ⋯ b : x ≥ a && x < b
   data _∈_⋯_ : ℕ → ℕ → ℕ → Set where
