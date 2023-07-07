@@ -89,9 +89,28 @@ module utilities.equality where
     base : {n : ℕ} → n ≥ n
     step : {n m : ℕ} → n ≥ m → succ n ≥ m
 
+  trans-< : {x y z : ℕ} → x < y → y < z → x < z
+  trans-< base base = step base
+  trans-< base (step q) = step (trans-< base q)
+  trans-< (step p) base = step (step p)
+  trans-< (step p) (step q) = step (trans-< (step p) q)
+
   step₂-< : {n m : ℕ} → n < m → succ n < succ m
   step₂-< base = base
   step₂-< (step p) = step (step₂-< p)
+
+  step₄-< : {x y : ℕ} → x < succ (x + y)
+  step₄-< {zero} {zero} = base
+  step₄-< {zero} {succ x} = step step₄-<
+  step₄-< {succ x} {y} = step₂-< step₄-<
+
+  step₃-<-aux : {x y z : ℕ} → x < y → (x + z) < (y + z)
+  step₃-<-aux base = base
+  step₃-<-aux (step p) = step (step₃-<-aux p)
+
+  step₃-< : {x y z : ℕ} → x < y → x < (y + z)
+  step₃-< {x} {.(succ x)} {z} base = step₄-<
+  step₃-< {x} {succ y} {z} (step p) = trans-< step₄-< (step₂-< (step₃-<-aux p))
 
   step₂-≥ : {n m : ℕ} → n ≥ m → succ n ≥ succ m
   step₂-≥ base = base
@@ -110,6 +129,11 @@ module utilities.equality where
   lemma-zero-<-succ : {n : ℕ} → zero < succ n
   lemma-zero-<-succ {zero} = base
   lemma-zero-<-succ {succ n} = step lemma-zero-<-succ
+
+  step₂-<-rev : {n m : ℕ} → succ n < succ m → n < m
+  step₂-<-rev base = base
+  step₂-<-rev (step base) = step base
+  step₂-<-rev (step (step p)) = step (step₂-<-rev (step p))
 
   step₂-≥-rev : {n m : ℕ} → succ n ≥ succ m → n ≥ m
   step₂-≥-rev base = base
@@ -135,3 +159,8 @@ module utilities.equality where
   lemma-split-inequalities zero (succ s) = left lemma-zero-<-succ
   lemma-split-inequalities (succ n) zero = right lemma-≥-zero
   lemma-split-inequalities (succ n) (succ s) = lemma-split-aux (lemma-split-inequalities n s)
+
+  lemmma-¬< : (n m : ℕ) → (n ≥ m) → ¬ (n < m)
+  lemmma-¬< zero zero p ()
+  lemmma-¬< zero (succ m) () q
+  lemmma-¬< (succ n) (succ m) p q = lemmma-¬< n m (step₂-≥-rev p) (step₂-<-rev q)

@@ -1,5 +1,6 @@
 {-# OPTIONS --allow-unsolved-metas #-}
 
+open import trees.BTree
 open import trees.LBTree
 open import utilities.optional
 open import utilities.equality
@@ -14,6 +15,16 @@ module trees.distinct-tree where
                     distinct-tree r →
                     ({y : ℕ} → (y ∈ l) → (y ∈ r) → ⊥) →
                     distinct-tree (l-node x l r)
+
+
+  distinct-labelling : (x : ℕ) → (t : BTree) → distinct-tree (label t x)
+  distinct-labelling x leaf = base
+  distinct-labelling x (node l r) = step 
+    (lemma-¬-∈ l x (succ x) base)
+    (lemma-¬-∈ r x (succ (x + BTree-size l)) step₄-<) 
+    (distinct-labelling (succ x) l) 
+    (distinct-labelling (succ (x + BTree-size l)) r) 
+    {!   !}
 
   depth : {t : LBTree} → distinct-tree t → (n : ℕ) → n ∈ t → ℕ
   depth {l-leaf x} dist n p = zero
@@ -41,4 +52,4 @@ module trees.distinct-tree where
   -- parent {l-node x l .(l-leaf n)} dist n (∈-right ∈-leaf) = some x
   -- parent {l-node x l .(l-node n _ _)} dist n (∈-right ∈-node) = some x
   -- parent {l-node x l .(l-node _ _ _)} dist n (∈-right (∈-left p)) = {!   !}
-  -- parent {l-node x l .(l-node _ _ _)} dist n (∈-right (∈-right p)) = {!   !} -- stesso pattern matching del caso sopra
+  -- parent {l-node x l .(l-node _ _ _)} dist n (∈-right (∈-right p)) = {!   !} -- stesso pattern matching del caso sopra 

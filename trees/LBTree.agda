@@ -26,10 +26,6 @@ module trees.LBTree where
     ∈-right : {n x : ℕ} {l r : LBTree} → n ∈ r → n ∈ l-node x l r
 
 
-
-
-
-
   lemma-≡-∈ : {t : LBTree} {n m : ℕ} → n ≡ m → n ∈ t → m ∈ t
   lemma-≡-∈ refl n∈t = n∈t
 
@@ -92,6 +88,14 @@ module trees.LBTree where
 
   lemma-unique-labelling₀ : (t : BTree) → (n : ℕ) → n ∈ zero ⋯ BTree-size t → n ∈ label t zero
   lemma-unique-labelling₀ t n p = lemma-unique-labelling t n zero p
+
+  lemma-¬-∈ : (t : BTree) → (x y : ℕ) → x < y → ¬ (x ∈ label t y)
+  lemma-¬-∈ leaf x .x p ∈-leaf = lemmma-¬< x x base p
+  lemma-¬-∈ (node l r) x .x p ∈-node = lemmma-¬< x x base p
+  lemma-¬-∈ (node l r) x y p (∈-left q) = lemma-¬-∈ l x (succ y) (step p) q
+  lemma-¬-∈ (node l r) x y p (∈-right q) = lemma-¬-∈ r x (succ (y + BTree-size l)) (step (step₃-< p)) q
+
+  
 
 
   --------------------------------
