@@ -93,7 +93,7 @@ module trees.LBTree where
   lemma-¬-∈ leaf x .x p ∈-leaf = lemmma-¬< x x base p
   lemma-¬-∈ (node l r) x .x p ∈-node = lemmma-¬< x x base p
   lemma-¬-∈ (node l r) x y p (∈-left q) = lemma-¬-∈ l x (succ y) (step p) q
-  lemma-¬-∈ (node l r) x y p (∈-right q) = lemma-¬-∈ r x (succ (y + BTree-size l)) (step (step₃-< p)) q
+  lemma-¬-∈ (node l r) x y p (∈-right q) = lemma-¬-∈ r x (succ (y + BTree-size l)) (step (step₄-< p)) q
 
   
 
@@ -108,18 +108,3 @@ module trees.LBTree where
 
   depth-label : BTree → LBTree -- label eache node/leaf with a value correspondign to his depth
   depth-label t = depth-label-aux t zero
-
-  -- depth : (t : LBTree) → (n : ℕ) → n ∈ t → ℕ -- va fatto passando un abitante di unique-labelled-tree (da implementare)
-  -- depth .(l-leaf n) n ∈-leaf = zero -- anche se tolgo il punto non cambia nulla
-  -- depth .(l-node n _ _) n ∈-node = zero
-  -- depth (l-node _ l _) n (∈-left p) = succ (depth l n p )
-  -- depth (l-node _ _ r) n (∈-right p) = succ (depth r n p)
-
-  
-
-
-  -- parent-tree-list : (t : LBTree) → ℕ → List ℕ
-  -- parent-tree-list (l-leaf x) n = {!   !}
-  -- parent-tree-list (l-node x t t₁) n = {!   !}
-
-

@@ -11,7 +11,7 @@ module trees.BTree where
   sample_tree : BTree
   sample_tree = node leaf (node (node leaf leaf) leaf)
 
-  {-   node
+  {-    node
         /  \
     leaf  node
           /  \

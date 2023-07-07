@@ -5,6 +5,9 @@ open import utilities.range
 
 module trees.PTree where
 
+  -- some tries to implement a tree as a parent vector, I don't know if it the way to go
+  -- I have to understand if it is better to use a parent function from distinct-tree or this
+
   data Vecᵣ (A : Set) : ℕ → Set where
     []  : Vecᵣ A zero
     _∷_ : {n : ℕ} → Vecᵣ A n → A → Vecᵣ A (succ n)

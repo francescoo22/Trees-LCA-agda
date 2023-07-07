@@ -99,18 +99,18 @@ module utilities.equality where
   step₂-< base = base
   step₂-< (step p) = step (step₂-< p)
 
-  step₄-< : {x y : ℕ} → x < succ (x + y)
-  step₄-< {zero} {zero} = base
-  step₄-< {zero} {succ x} = step step₄-<
-  step₄-< {succ x} {y} = step₂-< step₄-<
+  step₃-< : {x y : ℕ} → x < succ (x + y)
+  step₃-< {zero} {zero} = base
+  step₃-< {zero} {succ x} = step step₃-<
+  step₃-< {succ x} {y} = step₂-< step₃-<
 
-  step₃-<-aux : {x y z : ℕ} → x < y → (x + z) < (y + z)
-  step₃-<-aux base = base
-  step₃-<-aux (step p) = step (step₃-<-aux p)
+  step₄-<-aux : {x y z : ℕ} → x < y → (x + z) < (y + z)
+  step₄-<-aux base = base
+  step₄-<-aux (step p) = step (step₄-<-aux p)
 
-  step₃-< : {x y z : ℕ} → x < y → x < (y + z)
-  step₃-< {x} {.(succ x)} {z} base = step₄-<
-  step₃-< {x} {succ y} {z} (step p) = trans-< step₄-< (step₂-< (step₃-<-aux p))
+  step₄-< : {x y z : ℕ} → x < y → x < (y + z)
+  step₄-< {x} {.(succ x)} {z} base = step₃-<
+  step₄-< {x} {succ y} {z} (step p) = trans-< step₃-< (step₂-< (step₄-<-aux p))
 
   step₂-≥ : {n m : ℕ} → n ≥ m → succ n ≥ succ m
   step₂-≥ base = base

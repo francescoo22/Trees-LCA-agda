@@ -21,7 +21,7 @@ module trees.distinct-tree where
   distinct-labelling x leaf = base
   distinct-labelling x (node l r) = step 
     (lemma-¬-∈ l x (succ x) base)
-    (lemma-¬-∈ r x (succ (x + BTree-size l)) step₄-<) 
+    (lemma-¬-∈ r x (succ (x + BTree-size l)) step₃-<) 
     (distinct-labelling (succ x) l) 
     (distinct-labelling (succ (x + BTree-size l)) r) 
     {!   !}
@@ -32,7 +32,10 @@ module trees.distinct-tree where
   depth {l-node x l r} (step x₁ x₂ dist dist₁ x₃) n (∈-left p) = succ (depth dist n p)
   depth {l-node x l r} (step x₁ x₂ dist dist₁ x₃) n (∈-right p) = succ (depth dist₁ n p)
 
-  
+
+  -- some tries to implement a parent function for a distinct tree, I don't know if it the way to go
+  -- I have to understand if it is better to use a parent vector or this
+
   parent : {t : LBTree} → distinct-tree t → (n : ℕ) → n ∈ t → Optional ℕ
   parent {l-leaf x} dist n n∈t = none
   parent {l-node x l r} dist .x ∈-node = none

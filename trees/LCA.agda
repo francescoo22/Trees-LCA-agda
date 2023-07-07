@@ -4,6 +4,9 @@ open import utilities.natural
 open import utilities.equality
 
 module trees.LCA where
+  -- just a draft of Least Common Ancestor algorithm, 
+  -- probably to much work to achieve an implementation + proof of correctness
+
   -- data LCA : {t : LBTree} → distinct-tree t → (x y : ℕ) → x ∈ t → y ∈ t → Set where
 
   LCA-alg : {t : LBTree} → distinct-tree t → (x y : ℕ) → x ∈ t → y ∈ t → ℕ
